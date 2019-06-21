@@ -78,7 +78,8 @@ class DirService extends Service {
     if(result) {
       this.logger.info("call java tree service created dir")
     }
-    return id
+    return id 
+    
     
   }
 
@@ -146,7 +147,22 @@ class DirService extends Service {
 
   async updateDir(dirId, name) {
     const {model:{Dir}} = this.ctx
+    let {privileges:{urls:{updateItem}}} = this.config
+    let updateUrl = updateItem(dirId,name)
+    console.log('updateUrl', updateUrl)
+    let tmpData = {
+      method: 'put',
+      contentType: 'json',
+      dataType: 'json',
+    }
     const rs = await Dir.findOneAndUpdate({_id:dirId},{$set: {name}}, opts)
+    //调用java程序修改目录
+    //debugger
+    let result = await this.ctx.curl(updateUrl,tmpData)
+    if(!result.status===200){
+      console.error('update tee free java error!')
+      throw new Error('update tree from java exception');
+    }
     return rs
   }
 
