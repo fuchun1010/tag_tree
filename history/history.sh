@@ -1,0 +1,1 @@
+curl -XGET "http://localhost:7001/import/history/tag"
