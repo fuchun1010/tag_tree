@@ -129,7 +129,7 @@ class TagService extends Service {
     const {model:{Tag,Dir}} = this.ctx
     let {privileges:{urls:{deleteTag, deleteItem}}}  = this.config
     let deleteTagUrl = deleteTag(id);
-    debugger
+   
     //删除dc上对应的标签数据
     await this.deleteRedisTag(deleteTagUrl)
 
@@ -162,8 +162,11 @@ class TagService extends Service {
       // 删除普通的标签
       console.log('delete tag', Dir)
       //删除目录中的标签
+      //通过标签id找到目录中的标签.
+      const dir = await Dir.findOne({tagId:id})
       await Dir.deleteOne({tagId: id})
-      let deletedUrl = deleteItem(id);
+      //let deletedUrl = deleteItem(id);
+      let deletedUrl = deleteItem(dir.id);
       
 
       //调用java目录树删除

@@ -51,7 +51,8 @@ module.exports = appInfo => {
       },
       tagTreeUrl: 'http://localhost:10004/v1/tree',
       createItem: "http://localhost:10004/v1/add/node",
-      deleteItem: (id) => `http://localhost:10004/v1/delete/${id}/node`
+      deleteItem: (id) => `http://localhost:10004/v1/delete/${id}/node`,
+      updateItem: (id,name)=>`http://localhost:10004/v1/update/${id}/node/${encodeURIComponent(name)}/name`
     }
   }
 
