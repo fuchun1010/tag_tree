@@ -453,16 +453,42 @@ class TagController extends Controller {
       {"id":"3", "pid":"1","name":"目录2"},
       {"id":"4", "tagId": "tagB", name:"tagB", pid: "3"}
     ]
-    const {model:{Dir}} = this.ctx
+    const {model:{Dir,Tag}} = this.ctx
     
     let response = await Dir.find()
-    let result = response.map(item => {
+    let result = []
+    for(let item of response) {
+      //debugger
       let id  = item.id.toString && item.id.toString()
       let pid = item.pid
       let name = item.name
       let tagId = item.tagId
-      return {id, pid, name, tagId}
-    })
+      //计算标签是否失效
+      if(tagId){
+        //通过tagId查询到标签详情数据
+        let tag =await Tag.findOne({_id:tagId})
+        //在tab_tags表中可以找到对应的tag,则设置相应的isEnable状态
+        if(tag){
+          let {isActive,expireDate,createDate} = tag
+          //过期时间是否大于当前时间
+          let isExpired = expireDate ? new Date(expireDate).getTime() > new Date().getTime():true
+          //开始时间是否小于当前时间
+          let startDate = createDate ? new Date(createDate).getTime() < new Date().getTime():true
+          //是否被删除
+          let isDeleted = isActive
+          let isEnable = isExpired && startDate && isDeleted
+          result.push({id, pid, name, tagId, isEnable}) 
+        }else{
+          //如果在tab_tags表中没找到tag,则将isEnable设置为false.(不生效)
+          let isEnable = false
+          result.push({id, pid, name, tagId,isEnable})
+        }
+      }else{
+        //目录结构不需要设置isEnable状态!
+        result.push({id, pid, name, tagId}) 
+      }
+    }
+
     this.ctx.body = {
       records: result
     }

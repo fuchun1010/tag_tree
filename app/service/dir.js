@@ -83,6 +83,8 @@ class DirService extends Service {
     
   }
 
+  
+
   /**
    * 删除
    * @param {*} dirId 
@@ -101,7 +103,7 @@ class DirService extends Service {
     let _id = dirId
     let target = await Dir.findOne({_id});
     let isTag = target && target.tagId
-    
+
     if(isTag) {
       //1. 删除记录
       //2. 调用java删除,调用返回java的tree树
@@ -119,6 +121,7 @@ class DirService extends Service {
     else {
       //删除目录
       let id =  dirId
+      debugger
       let children = await Dir.find({pid:id})
       if(children.length > 0) {
         throw new Error('还有子数据,禁止删除')
@@ -132,6 +135,14 @@ class DirService extends Service {
           await Dir.deleteOne({_id:id})
         }
       }
+     // 删除java缓存中的目录.
+      // let deletedResult = await this.ctx.curl(deletedUrl, tmpData);
+      // if(!deletedResult){
+      //   throw new Error('delete dir failure')
+      // }else{
+      //   //递归删除目录.
+      //    await this.recursionDeleteDirById(id)
+      // }
     }
 
     let tree = await this.ctx.curl(tagTreeUrl, {dataType: 'json'});
@@ -144,6 +155,20 @@ class DirService extends Service {
     }
     
   }
+
+  //递归删除目录
+  // async recursionDeleteDirById (id) {
+  //     const {model:{Dir}} = this.ctx
+  //     let children = await Dir.find({pid:id})
+  //     let len = children.length
+  //     debugger
+  //     for(let i = 0; i < len; i++){
+  //       if(!children[i].tagId){
+  //          await this.recursionDeleteDirById(id)
+  //       }
+  //     } 
+  //     await Dir.deleteOne({_id:id})
+  //   }
 
   async updateDir(dirId, name) {
     const {model:{Dir}} = this.ctx
