@@ -7,7 +7,7 @@
     "axios": "^0.18.0",
     "bson-objectid": "^1.2.2",
     "cron-parser": "^2.4.5",
-    "csv-parse": "^2.1.0",
+    "csv-parse": "^4.6.5",
     "egg": "^2.0.0",
     "egg-cors": "^2.0.0",
     "egg-mongoose": "^2.1.1",
